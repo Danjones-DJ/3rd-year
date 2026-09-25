@@ -1,0 +1,109 @@
+---
+title: "Measurement: What, Why and How
+"
+output: html_notebook
+---
+
+# Lecture portion
+
+### Objectives
+
+- Understanding what measurement is and why it's important
+
+- Being able to compare Representative versus Pragmatic
+
+- Concepts compared to indicators
+
+- Know how social measurements can be used and misused
+
+## Reading: Pragmatic Social Measurement Chapters 1&2
+
+Measurements are often not agreed on by all social scientists, making measurement fundamentally different in social science than in physical and biological sciences where concepts like length, mass, etc, are universally agreed in terms of definitions and how they are measured.
+
+**Why some concepts can become uncontested?**
+
+1) If they are proved not just useful but also necessary for communication
+
+2) If they are proved to be reproducible and reliable
+
+**Measurement as inference**
+
+- Measurement can be considered a type of inference, alongside Population (statistical) inference and causal inference.
+
+- Measurement differs from the two above due to the use of observed values - indicators - to make claims about a different kind of quantity. That is, in simple terms: Measurement inference takes indicators, and attempts to use their observed values, to talk about some target concept.
+
+  - E.g., to measure happiness, you might use income, leisure time, and marriage rates as indicators.
+
+- For this measurement to be successful, we have to understand the relationship between the observed data and the quantities for which we aim to infer.
+
+**Getting pragmatic**
+
+Representational measurement commits to the idea that we are measuring real attributes of empirical systems.
+
+1.  Objects exist
+2.  Objects interact with one another
+3.  These interactions occur through causal processes
+4.  These causal interactions are conditioned through the attributes of the object(s)
+5.  As such, changing attributes would change the interactions that follow.
+
+That is to say representational measurement is taking a causally generative point of view on how the attributes we want to measure related to the data collected.
+
+So, we can learn about an objects attributes by taking a measurement procedure involving calibrated interactions with other objects.
+
+Pragmatic measurement is another approach, where given the human nature of measurement for communication, here we start with the idea that we have measurement procedures.
+
+1.  We can specify measurement procedures
+2.  We can define concepts as the outputs of the above procedures
+
+This helps us to avoid making strong assumptions, and can offer useful summaries. We may label a country a democracy, and academics may argue to move to a more representational view of how we are defining that label, but for communication - "democracy" paints a clear enough label.
+
+# Seminar portion
+
+Looking at existing measures of how democratic countries have been historically over time.
+
+Data constructed with a synthetic measure of how democratic countries were, combining info of different measure. All different scales by different authors.
+
+1.  Before you look at the data set, consider whether you think of countries being democratic as a binary quantity or not. Is it the case that a country is either democratic or not, with no middle ground? Or is it a continuum, with countries varying widely in how democratic they are? Can a country be somewhat democratic?
+
+Democracy is a continuum that can be crudely simplified. The UK and the USA are both democratic, but that is not to say their political system, infrastructure, and interactions are anywhere near identical. It would suffice as a label for communication, but due to variation and the different ways in which countries can be democratic, that breadth needs to be considered. America is arguably becoming less democratic, yet it is not (yet) an autocracy.
+
+> 2.  Load the data file “week-1-democracy.Rdata” into R. The first three variables in the data frame “democracy” are:
+>
+>     - `cowcode`: COW country codes according to the [Correlates of War Project](http://www.correlatesofwar.org/)
+>
+>     - `country`: country name
+>
+>     - `year`: calendar year
+>
+> If you look at the top of the data file using `head(democracy)` you will see 12 further variables (in alphabetic order from `arat` to `vanhanen`). Each of these corresponds to a different measure of democracy. You might recognise some of the names (eg `freedomhouse` and `polity` are relatively well-known and widely used). The coverage of country-years varies by measure.
+>
+> For each of the 12 measures, use the data set to calculate the range of scores used for that measure.
+
+```{r}
+library(tidyverse) # Will have every function I need for simple data analysis
+
+# Load function takes an Rdata file, and puts the data directly into the environment
+load("data/week-1-democracy.Rdata") # When you run this, see what data is added to Environment
+
+# Spoiler - it's called "democracy"
+
+# I want to quickly get the range of scores for these measures which question tells me is arat to vanhanen, so I select just these and use the summary function
+democracy %>%
+  select(arat:vanhanen) %>% 
+  summary() %>% kableExtra::kable() # Kable just makes the output a bit easier on the eyes.
+
+```
+
+> 3.  In addition to the range of scores, we might want to know if the distribution of scores look similar for the different measures. Generate histograms of all the scores for each measure. Do they look generally similar or not?
+
+> 4.  The `polity` score has integer values from -10 to 10. Calculate the proportion of country-years that are classified as democratic by `pacl`, among country-years with each value of the `polity` score.
+
+> 5.  Plot the results of Q4 by `polity` score. Describe the association you see between the two scores.
+
+> 6.  Which are the country-years that are classified as a 10 by `polity` and 0 (non-democratic) by `pacl`? Take the last of these in the data set, and figure out whether the `polity` or the `pacl` score changed in the subsequent year. What happened in that country in that year?*Hint*: There are many ways to achieve this. And it’s always a good idea to get inspiration from the internet.
+
+> 7.  Plot the trajectory of the `polity` scores and the `pacl` scores for the country in question across the full set of years in the data set.
+
+> 8.  Use the command `cor(democracy[,4:15],use = "pairwise.complete.obs")` to calculate the correlation table for the 12 measures. You may want to wrap that in a `round(x,2)` command to make it easier to read. Note that the `use =` argument is needed because not all the measures are available in all the country-years, so we just calculate correlations between measures for the country-years where both are available. What does a higher correlation mean in this context? What does a low correlation mean in this context?
+
+> 9.  Overall, do these seem like big disagreements between measures or small disagreements between measures? Are you surprised at how much different measures agree or at how much they disagree?
