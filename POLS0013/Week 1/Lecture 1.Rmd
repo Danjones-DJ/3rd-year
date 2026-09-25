@@ -64,6 +64,11 @@ This helps us to avoid making strong assumptions, and can offer useful summaries
 
 # Seminar portion
 
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse) # Will have every function I need for simple data analysis
+library(kableExtra) # Nice formatting (only because I'm rendering this as a PDF)
+```
+
 Looking at existing measures of how democratic countries have been historically over time.
 
 Data constructed with a synthetic measure of how democratic countries were, combining info of different measure. All different scales by different authors.
@@ -85,10 +90,7 @@ Democracy is a continuum that can be crudely simplified. The UK and the USA are 
 > For each of the 12 measures, use the data set to calculate the range of scores used for that measure.
 
 ```{r}
-# install.packages("tinytex")
-# tinytex::install_tinytex()
-library(tidyverse) # Will have every function I need for simple data analysis
-library(kableExtra)
+
 # Load function takes an Rdata file, and puts the data directly into the environment
 load("data/week-1-democracy.Rdata") # When you run this, see what data is added to Environment
 
@@ -106,11 +108,79 @@ democracy %>%
 
 > 3.  In addition to the range of scores, we might want to know if the distribution of scores look similar for the different measures. Generate histograms of all the scores for each measure. Do they look generally similar or not?
 
+```{r}
+
+# You could manually just run hist(democracy$var) but I don't want to manually do that
+
+# Plan is, select the columns I care about, pivot to a longer format so I can use ggplot2 and facet by each measure without losing values 
+
+democracy_long = democracy %>%
+  select(arat:vanhanen) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "measure",
+    values_to = "score"
+  ) 
+
+# Once in a long format drop NA's and create plot
+democracy_long %>%
+  drop_na() %>% # No particular reason, just removes a warning
+  ggplot(aes(x = score)) + # Variable from above
+  geom_histogram(bins = 10) + # Makes hist
+  facet_wrap(~ measure, scales = "free") # Facet - "for every unique value in measure make a hist of its values")
+```
+
+Choosing just 10 bins shows that none of these have a particularly similar shape, significantly all scales are different. Some are seemingly continuous, whilst others seem like Likert-scales, probabilities, or Deciles. These measures are not even close to being similar.
+
 > 4.  The `polity` score has integer values from -10 to 10. Calculate the proportion of country-years that are classified as democratic by `pacl`, among country-years with each value of the `polity` score.
+
+```{r}
+
+# I want to see for each Polity score, what proportion are considered a democratic 
+# pacl is clearly binary in above histogram
+# 1 = democratic. 
+# Nice lifehack is to find proportion, we can just take the mean
+# (0= no, so contributes nothing)
+
+
+# # This code would be sufficient below is just more nicely formatted
+# democracy %>%
+#   group_by(polity) %>% # So the summary has a row for each value of polity
+#   summarise(prop_democratic = mean(pacl, na.rm = TRUE)) 
+
+polity_propdemo = democracy %>%
+  group_by(polity) %>% # So the summary has a row for each value of polity
+  summarise(prop_democratic = round(mean(pacl, na.rm = TRUE) * 100, 2)) %>% 
+  drop_na() 
+
+polity_propdemo %>%
+  kable(format = "latex", booktabs = TRUE) %>% # Latex is bog standard for formating
+  kable_styling(latex_options = c("striped", "scale_down")) # A striped, nicely scaled table
+
+
+
+
+
+
+```
 
 > 5.  Plot the results of Q4 by `polity` score. Describe the association you see between the two scores.
 
+```{r}
+polity_propdemo %>%
+  ggplot(aes(x=polity, y=prop_democratic)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+
+
+
+```
+
+It reveals a positive relationship where as polity increases, the proportion recorded as democratic by paml increased. The increase is lower between extremely negative polity scores, and grows rapidly as polity becomes positive.
+
 > 6.  Which are the country-years that are classified as a 10 by `polity` and 0 (non-democratic) by `pacl`? Take the last of these in the data set, and figure out whether the `polity` or the `pacl` score changed in the subsequent year. What happened in that country in that year?*Hint*: There are many ways to achieve this. And it’s always a good idea to get inspiration from the internet.
+
+**TO BE CONTINUED**
 
 > 7.  Plot the trajectory of the `polity` scores and the `pacl` scores for the country in question across the full set of years in the data set.
 
