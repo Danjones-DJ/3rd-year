@@ -1,10 +1,15 @@
 ---
-title: "Measurement: What, Why and How
-"
-output: html_notebook
+title: 'Measurement: What, Why and How'
+author: "DMJ"
+date: "2026-09-25"
+output: pdf_document
 ---
 
-# Lecture portion
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lecture portion
 
 ### Objectives
 
@@ -22,9 +27,9 @@ Measurements are often not agreed on by all social scientists, making measuremen
 
 **Why some concepts can become uncontested?**
 
-1) If they are proved not just useful but also necessary for communication
+1)  If they are proved not just useful but also necessary for communication
 
-2) If they are proved to be reproducible and reliable
+2)  If they are proved to be reproducible and reliable
 
 **Measurement as inference**
 
@@ -63,7 +68,7 @@ Looking at existing measures of how democratic countries have been historically 
 
 Data constructed with a synthetic measure of how democratic countries were, combining info of different measure. All different scales by different authors.
 
-1.  Before you look at the data set, consider whether you think of countries being democratic as a binary quantity or not. Is it the case that a country is either democratic or not, with no middle ground? Or is it a continuum, with countries varying widely in how democratic they are? Can a country be somewhat democratic?
+> 1.  Before you look at the data set, consider whether you think of countries being democratic as a binary quantity or not. Is it the case that a country is either democratic or not, with no middle ground? Or is it a continuum, with countries varying widely in how democratic they are? Can a country be somewhat democratic?
 
 Democracy is a continuum that can be crudely simplified. The UK and the USA are both democratic, but that is not to say their political system, infrastructure, and interactions are anywhere near identical. It would suffice as a label for communication, but due to variation and the different ways in which countries can be democratic, that breadth needs to be considered. America is arguably becoming less democratic, yet it is not (yet) an autocracy.
 
@@ -80,8 +85,10 @@ Democracy is a continuum that can be crudely simplified. The UK and the USA are 
 > For each of the 12 measures, use the data set to calculate the range of scores used for that measure.
 
 ```{r}
+# install.packages("tinytex")
+# tinytex::install_tinytex()
 library(tidyverse) # Will have every function I need for simple data analysis
-
+library(kableExtra)
 # Load function takes an Rdata file, and puts the data directly into the environment
 load("data/week-1-democracy.Rdata") # When you run this, see what data is added to Environment
 
@@ -90,7 +97,10 @@ load("data/week-1-democracy.Rdata") # When you run this, see what data is added 
 # I want to quickly get the range of scores for these measures which question tells me is arat to vanhanen, so I select just these and use the summary function
 democracy %>%
   select(arat:vanhanen) %>% 
-  summary() %>% kableExtra::kable() # Kable just makes the output a bit easier on the eyes.
+  summary() %>% # For numeric types, does things like min max NA count etc
+  kable(format = "latex", booktabs = TRUE) %>% # Latex is bog standard for formating
+  kable_styling(latex_options = c("striped", "scale_down")) # A striped, nicely scaled table
+
 
 ```
 
